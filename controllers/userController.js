@@ -111,3 +111,18 @@ export const registerUser = asyncHandler(async (req, res) => {
     throw new Error('Invalid user data!')
   }
 })
+
+// @desc    Delete A User by Id
+// @route   DELETE /api/v1/users/:id
+// @access  Private/Admin
+export const deleteUser = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.params.id)
+
+  if (user) {
+    await user.remove()
+    res.status(201).json({ success: true, message: 'User Deleted!' })
+  } else {
+    res.status(404)
+    throw new Error('User Not Found!')
+  }
+})

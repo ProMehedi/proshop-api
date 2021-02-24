@@ -1,6 +1,7 @@
 import express from 'express'
 import {
   authUser,
+  deleteUser,
   getUserProfile,
   getUsers,
   registerUser,
@@ -17,5 +18,8 @@ router.route('/login').post(authUser)
 
 // Get User Profile
 router.route('/profile').get(isLogin, getUserProfile)
+
+// Fetch All Products
+router.route('/:id').delete(isLogin, isAdminUser, deleteUser)
 
 export default router
