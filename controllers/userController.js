@@ -1,6 +1,6 @@
 import asyncHandler from 'express-async-handler'
-import jwt from 'jsonwebtoken'
 import User from '../models/userModel.js'
+import generateToken from '../utils/genarateToken.js'
 
 // @desc    Fetch All Users
 // @route   GET /api/v1/users
@@ -25,17 +25,13 @@ export const authUser = asyncHandler(async (req, res) => {
 
   if (user) {
     if (user && user.mathPassword(password)) {
-      const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, {
-        expiresIn: '1d',
+      const token = generateToken(user._id)
+      res.status(201).send({
+        name: user.name,
+        email: user.email,
+        isAdmin: user.isAdmin,
+        token,
       })
-      res
-        .status(201)
-        .send({
-          name: user.name,
-          email: user.email,
-          isAdmin: user.isAdmin,
-          token,
-        })
     } else {
       res.status(400).send('Email or Password Wrong!')
     }
