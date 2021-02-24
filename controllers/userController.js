@@ -4,7 +4,7 @@ import generateToken from '../utils/genarateToken.js'
 
 // @desc    Fetch All Users
 // @route   GET /api/v1/users
-// @access  Public
+// @access  Private/Admin
 export const getUsers = asyncHandler(async (req, res) => {
   const userList = await User.find().select('-password')
 

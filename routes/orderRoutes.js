@@ -5,20 +5,20 @@ import {
   getOrderById,
   updateOrderToPaid,
 } from '../controllers/orderController.js'
-import { protect } from '../middleware/authMiddleware.js'
+import { isLogin } from '../middleware/authMiddleware.js'
 
 const router = express.Router()
 
 // Get Login User Orders
-router.route('/myorders').get(protect, getMyOrders)
+router.route('/myorders').get(isLogin, getMyOrders)
 
 // Get A Order By ID
-router.route('/:id').get(protect, getOrderById)
+router.route('/:id').get(isLogin, getOrderById)
 
 // Create New Order
-router.route('/').post(protect, addNewOrder)
+router.route('/').post(isLogin, addNewOrder)
 
 // Get A Order By ID
-router.route('/:id/pay').put(protect, updateOrderToPaid)
+router.route('/:id/pay').put(isLogin, updateOrderToPaid)
 
 export default router
