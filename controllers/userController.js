@@ -60,3 +60,54 @@ export const getUserProfile = asyncHandler(async (req, res) => {
     throw new Error('User not Found!')
   }
 })
+
+// @desc    Register New User
+// @route   POST /api/v1/users/
+// @access  Public
+export const registerUser = asyncHandler(async (req, res) => {
+  const {
+    name,
+    email,
+    password,
+    phone,
+    isAdmin,
+    postalCode,
+    city,
+    country,
+  } = req.body
+  const userExists = await User.findOne({ email })
+
+  if (userExists) {
+    res.status(400)
+    throw new Error('User already exists!')
+  }
+
+  const user = await User.create({
+    name,
+    email,
+    password,
+    phone,
+    isAdmin,
+    postalCode,
+    city,
+    country,
+  })
+
+  if (user) {
+    const token = generateToken(user._id)
+    res.status(201).send({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      phone: user.phone,
+      isAdmin: user.isAdmin,
+      postalCode: user.postalCode,
+      city: user.city,
+      country: user.country,
+      token,
+    })
+  } else {
+    res.status(400)
+    throw new Error('Invalid user data!')
+  }
+})
