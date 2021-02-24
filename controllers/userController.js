@@ -27,6 +27,7 @@ export const authUser = asyncHandler(async (req, res) => {
     if (user && user.mathPassword(password)) {
       const token = generateToken(user._id)
       res.status(201).send({
+        _id: user._id,
         name: user.name,
         email: user.email,
         isAdmin: user.isAdmin,
@@ -35,6 +36,25 @@ export const authUser = asyncHandler(async (req, res) => {
     } else {
       res.status(400).send('Email or Password Wrong!')
     }
+  } else {
+    res.status(404)
+    throw new Error('User not Found!')
+  }
+})
+
+// @desc    Get User Profile
+// @route   GET /api/v1/users/profile
+// @access  Private
+export const getUserProfile = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id)
+
+  if (user) {
+    res.status(201).json({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      isAdmin: user.isAdmin,
+    })
   } else {
     res.status(404)
     throw new Error('User not Found!')
