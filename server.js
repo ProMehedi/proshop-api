@@ -27,8 +27,13 @@ app.get('/', (req, res) => {
   res.send('Server is ready!')
 })
 
+// Product Routes
 app.use(`${api}/products`, productRoutes)
+
+// User Routes
 app.use(`${api}/users`, userRoutes)
+
+// Order Routes
 app.use(`${api}/orders`, orderRoutes)
 
 // Custom Error Handling
