@@ -1,4 +1,5 @@
 import mongoose from 'mongoose'
+import bcrypt from 'bcryptjs'
 
 const userSchema = mongoose.Schema(
   {
@@ -19,9 +20,12 @@ const userSchema = mongoose.Schema(
 userSchema.virtual('id').get(function () {
   return this._id.toHexString()
 })
-
-// Ensure virtual fields are serialised.
 userSchema.set('toJSON', { virtuals: true })
+
+// Hashing The Password
+userSchema.methods.mathPassword = async function (enteredPass) {
+  return bcrypt.compareSync(enteredPass, this.password)
+}
 
 const User = mongoose.model('User', userSchema)
 export default User
