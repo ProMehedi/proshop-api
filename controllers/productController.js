@@ -5,6 +5,9 @@ import Product from '../models/productModel.js'
 // @route   GET /api/v1/products
 // @access  Public
 export const getProducts = asyncHandler(async (req, res) => {
+  const productsPerPage = 2
+  const page = Number(req.query.page) || 1
+
   // Search Products /api/v1/products?keyword=abc
   const keyword = req.query.keyword
     ? {
@@ -12,10 +15,16 @@ export const getProducts = asyncHandler(async (req, res) => {
       }
     : {}
 
+  const count = await Product.count({ ...keyword })
+
   const products = await Product.find({ ...keyword })
+    .limit(productsPerPage)
+    .skip(productsPerPage * (page - 1))
 
   if (products) {
-    res.status(201).json(products)
+    res
+      .status(201)
+      .json({ products, page, pages: Math.ceil(count / productsPerPage) })
   } else {
     res.status(404)
     throw new Error('Product Not Found!')
