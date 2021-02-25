@@ -1,6 +1,23 @@
 import asyncHandler from 'express-async-handler'
 import Order from '../models/orderModel.js'
 
+// @desc    Fetch All Orders
+// @route   GET /api/v1/orders
+// @access  Private/Admin
+export const getOrders = asyncHandler(async (req, res) => {
+  const orders = await Order.find({}).populate(
+    'user',
+    '-password -createdAt -updatedAt'
+  )
+
+  if (orders) {
+    res.status(201).json(orders)
+  } else {
+    res.status(404)
+    throw new Error('No Order Found!')
+  }
+})
+
 // @desc    Fetch Login User Orders
 // @route   GET /api/v1/orders/myorders
 // @access  Private

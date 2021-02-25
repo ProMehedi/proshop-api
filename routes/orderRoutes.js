@@ -3,9 +3,10 @@ import {
   addNewOrder,
   getMyOrders,
   getOrderById,
+  getOrders,
   updateOrderToPaid,
 } from '../controllers/orderController.js'
-import { isLogin } from '../middleware/authMiddleware.js'
+import { isAdminUser, isLogin } from '../middleware/authMiddleware.js'
 
 const router = express.Router()
 
@@ -16,7 +17,10 @@ router.route('/myorders').get(isLogin, getMyOrders)
 router.route('/:id').get(isLogin, getOrderById)
 
 // Create New Order
-router.route('/').post(isLogin, addNewOrder)
+router
+  .route('/')
+  .get(isLogin, isAdminUser, getOrders)
+  .post(isLogin, addNewOrder)
 
 // Get A Order By ID
 router.route('/:id/pay').put(isLogin, updateOrderToPaid)
