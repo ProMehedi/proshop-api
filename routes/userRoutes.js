@@ -21,13 +21,13 @@ router
 // Fetch All Users
 router.route('/').post(registerUser).get(isLogin, isAdminUser, getUsers)
 
-// Fetch A User By Id
-router.route('/:id').get(isLogin, isAdminUser, getUserById)
+// Fetch & Delete A User By Id
+router
+  .route('/:id')
+  .get(isLogin, isAdminUser, getUserById)
+  .delete(isLogin, isAdminUser, deleteUser)
 
 // Authenticate User & Get Token
 router.route('/login').post(authUser)
-
-// Delete A User By Id
-router.route('/:id').delete(isLogin, isAdminUser, deleteUser)
 
 export default router
