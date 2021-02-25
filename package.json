@@ -7,7 +7,8 @@
   "scripts": {
     "start": "nodemon server",
     "data:import": "node seeder",
-    "data:destroy": "node seeder -d"
+    "data:destroy": "node seeder -d",
+    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install"
   },
   "repository": {
     "type": "git",
