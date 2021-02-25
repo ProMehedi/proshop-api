@@ -23,8 +23,8 @@ userSchema.virtual('id').get(function () {
 userSchema.set('toJSON', { virtuals: true })
 
 // Hashing The Password
-userSchema.methods.mathPassword = async function (enteredPass) {
-  return bcrypt.compareSync(enteredPass, this.password)
+userSchema.methods.matchPassword = async function (enteredPass) {
+  return await bcrypt.compare(enteredPass, this.password)
 }
 
 // Hashing Password when Register/Update
