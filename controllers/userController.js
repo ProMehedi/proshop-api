@@ -90,7 +90,7 @@ export const updateUserProfile = asyncHandler(async (req, res) => {
 
     const updatedUser = await user.save()
 
-    res.status(201).send({
+    res.json({
       _id: updatedUser._id,
       name: updatedUser.name,
       email: updatedUser.email,
@@ -100,6 +100,39 @@ export const updateUserProfile = asyncHandler(async (req, res) => {
       city: updatedUser.city,
       country: updatedUser.country,
       token: generateToken(updatedUser._id),
+    })
+  } else {
+    res.status(404)
+    throw new Error('User not Found!')
+  }
+})
+
+// @desc    Update A User By Id
+// @route   PUT /api/v1/users/:id
+// @access  Private/Admin
+export const updateUserById = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.params.id)
+
+  if (user) {
+    user.name = req.body.name || user.name
+    user.email = req.body.email || user.email
+    user.phone = req.body.phone || user.phone
+    user.postalCode = req.body.postalCode || user.postalCode
+    user.city = req.body.city || user.city
+    user.country = req.body.country || user.country
+    user.isAdmin = req.body.isAdmin
+
+    const updatedUser = await user.save()
+
+    res.json({
+      _id: updatedUser._id,
+      name: updatedUser.name,
+      email: updatedUser.email,
+      phone: updatedUser.phone,
+      isAdmin: updatedUser.isAdmin,
+      postalCode: updatedUser.postalCode,
+      city: updatedUser.city,
+      country: updatedUser.country,
     })
   } else {
     res.status(404)

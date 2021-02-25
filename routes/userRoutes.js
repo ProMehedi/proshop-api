@@ -6,6 +6,7 @@ import {
   getUserProfile,
   getUsers,
   registerUser,
+  updateUserById,
   updateUserProfile,
 } from '../controllers/userController.js'
 import { isAdminUser, isLogin } from '../middleware/authMiddleware.js'
@@ -26,6 +27,7 @@ router
   .route('/:id')
   .get(isLogin, isAdminUser, getUserById)
   .delete(isLogin, isAdminUser, deleteUser)
+  .put(isLogin, isAdminUser, updateUserById)
 
 // Authenticate User & Get Token
 router.route('/login').post(authUser)
