@@ -5,13 +5,14 @@ import Product from '../models/productModel.js'
 // @route   GET /api/v1/products
 // @access  Public
 export const getProducts = asyncHandler(async (req, res) => {
-  // Filter By Categories /api/v1/products?categories=ID1,ID2
-  let filter = {}
-  if (req.query.categories) {
-    filter = { category: req.query.categories.split(',') }
-  }
+  // Search Products /api/v1/products?keyword=abc
+  const keyword = req.query.keyword
+    ? {
+        name: { $regex: req.query.keyword, $options: 'i' },
+      }
+    : {}
 
-  const products = await Product.find(filter)
+  const products = await Product.find({ ...keyword })
 
   if (products) {
     res.status(201).json(products)
