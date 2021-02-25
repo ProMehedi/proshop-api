@@ -1,6 +1,7 @@
 import path from 'path'
 import express from 'express'
 import dotenv from 'dotenv'
+import morgan from 'morgan'
 import colors from 'colors'
 import productRoutes from './routes/productRoutes.js'
 import userRoutes from './routes/userRoutes.js'
@@ -17,6 +18,11 @@ connectDB()
 
 // Initialize The Express
 const app = express()
+
+// Initialize Morgan
+if (process.env.NODE_ENV === 'development') {
+  app.use(morgan('dev'))
+}
 
 // Middleware
 app.use(express.json())

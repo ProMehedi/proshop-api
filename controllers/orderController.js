@@ -11,7 +11,7 @@ export const getOrders = asyncHandler(async (req, res) => {
   )
 
   if (orders) {
-    res.status(201).json(orders)
+    res.json(orders)
   } else {
     res.status(404)
     throw new Error('No Order Found!')
@@ -25,7 +25,7 @@ export const getMyOrders = asyncHandler(async (req, res) => {
   const orders = await Order.find({ user: req.user._id })
 
   if (orders) {
-    res.status(201).json(orders)
+    res.json(orders)
   } else {
     res.status(404)
     throw new Error('No Order Found!')
@@ -42,7 +42,7 @@ export const getOrderById = asyncHandler(async (req, res) => {
   )
 
   if (order) {
-    res.status(201).json(order)
+    res.json(order)
   } else {
     res.status(404)
     throw new Error('Order not found!')
@@ -80,7 +80,7 @@ export const addNewOrder = asyncHandler(async (req, res) => {
 
     const createOrder = await order.save()
 
-    res.status(201).json(createOrder)
+    res.json(createOrder)
   }
 })
 
@@ -101,7 +101,7 @@ export const updateOrderToPaid = asyncHandler(async (req, res) => {
     }
 
     const updatedOrder = await order.save()
-    res.status(201).json(updatedOrder)
+    res.json(updatedOrder)
   } else {
     res.status(404)
     throw new Error('Order not found!')
@@ -119,7 +119,7 @@ export const updateOrderToDelivered = asyncHandler(async (req, res) => {
     order.deliveredAt = Date.now()
 
     const updatedOrder = await order.save()
-    res.status(201).json(updatedOrder)
+    res.json(updatedOrder)
   } else {
     res.status(404)
     throw new Error('Order not found!')
