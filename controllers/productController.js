@@ -52,7 +52,7 @@ export const deleteProductById = asyncHandler(async (req, res) => {
 
 // @desc    Create New Product
 // @route   POST /api/v1/products/
-// @access  Private/Admin
+// @access  Private
 export const createProduct = asyncHandler(async (req, res) => {
   const product = new Product({
     user: req.user._id,
@@ -73,10 +73,55 @@ export const createProduct = asyncHandler(async (req, res) => {
 
   const createdProduct = await product.save()
 
-  if (product) {
-    res.status(201).json(product)
+  if (createdProduct) {
+    res.status(201).json(createdProduct)
   } else {
     res.status(401)
     throw new Error("This Product can't be added!")
+  }
+})
+
+// @desc    Update A Product
+// @route   PUT /api/v1/products/:id
+// @access  Private
+export const updateProduct = asyncHandler(async (req, res) => {
+  const product = await Product.findById(req.params.id)
+
+  const {
+    name,
+    description,
+    richDescription,
+    image,
+    images,
+    brand,
+    price,
+    category,
+    countInStock,
+    rating,
+    reviews,
+    numReviews,
+    isFeatured,
+  } = req.body
+
+  if (product) {
+    product.name = name
+    product.description = description
+    product.richDescription = richDescription
+    product.image = image
+    product.images = images
+    product.brand = brand
+    product.price = price
+    product.category = category
+    product.countInStock = countInStock
+    product.rating = rating
+    product.reviews = reviews
+    product.numReviews = numReviews
+    product.isFeatured = isFeatured
+
+    const updatedProduct = await product.save()
+    res.status(201).json(updatedProduct)
+  } else {
+    res.status(401)
+    throw new Error('Product not found!')
   }
 })
