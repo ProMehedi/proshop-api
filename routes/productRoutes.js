@@ -5,6 +5,7 @@ import {
   deleteProductById,
   getProductById,
   getProducts,
+  getTopProducts,
   updateProduct,
 } from '../controllers/productController.js'
 import { isAdminUser, isLogin } from '../middleware/authMiddleware.js'
@@ -23,5 +24,8 @@ router
 
 // Product Reviews
 router.route('/:id/reviews').post(isLogin, createProductReview)
+
+// Top Rated Product
+router.get('/top', getTopProducts)
 
 export default router
