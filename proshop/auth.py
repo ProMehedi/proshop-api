@@ -1,4 +1,5 @@
 from flask import Blueprint, request
+from werkzeug.security import generate_password_hash
 from .models.user import User
 from .config import db
 from .schemas.user import userSchema
@@ -39,7 +40,7 @@ def register_user():
         last_name=request.json.get('lastName'),
         email=request.json.get('email'),
         phone=request.json.get('phone'),
-        password=request.json.get('password')
+        password=generate_password_hash(request.json.get('password'))
     )
 
     new_user = db.users.insert_one(dict(user))
