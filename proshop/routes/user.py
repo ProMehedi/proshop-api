@@ -1,13 +1,13 @@
 from flask import Blueprint, request
 from werkzeug.security import generate_password_hash
-from .models.user import User
-from .config import db
-from .schemas.user import userSchema
+from ..models.user import User
+from ..configs.db import db
+from ..schemas.user import userSchema
 
-auth = Blueprint('auth', __name__)
+user = Blueprint('user', __name__)
 
 
-@auth.post('/register')
+@user.post('/register')
 def register_user():
     if not request.data:
         return {"success": False, "message": "No data provided"}, 400
