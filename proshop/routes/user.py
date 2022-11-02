@@ -1,5 +1,6 @@
 from flask import Blueprint, request
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
 from ..models.user import User
 from ..configs.db import db
 from ..schemas.user import userSchema
@@ -77,5 +78,6 @@ def login_user():
     return {
         "success": True,
         "message": "User logged in successfully",
-        "data": userSchema(user)
+        "data": userSchema(user),
+        "token": create_access_token({'id': str(user['_id'])})
     }, 200

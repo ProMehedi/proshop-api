@@ -1,10 +1,12 @@
 from flask import Flask
 from .configs.settings import URL_PREFIX
+from flask_jwt_extended import JWTManager
 
 
 def create_app(config_file='configs/settings.py'):
     app = Flask(__name__)
     app.config.from_pyfile(config_file)
+    JWTManager(app)
 
     from .routes.user import user
     from .routes.products import products
