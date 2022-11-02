@@ -50,7 +50,8 @@ def register_user():
     return {
         "success": True,
         "message": "User registered successfully",
-        "data": userSchema(created_user)
+        "data": userSchema(created_user),
+        "token": create_access_token({'id': str(created_user['_id'])})
     }, 201
 
 
