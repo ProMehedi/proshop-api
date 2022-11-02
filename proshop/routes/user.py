@@ -1,4 +1,5 @@
 from flask import Blueprint, request
+from bson.objectid import ObjectId
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
 from ..models.user import User
@@ -79,7 +80,7 @@ def login_user():
         "success": True,
         "message": "User logged in successfully",
         "data": userSchema(user),
-        "token": create_access_token({'id': str(user['_id']), 'email': user['email']})
+        "token": create_access_token({'id': str(user['_id'])})
     }, 200
 
 
@@ -90,7 +91,9 @@ def get_user_profile():
     if not identity:
         return {"success": False, "message": "Not authorized! Invalid token"}, 401
 
-    user = db.users.find_one({'email': identity['email']})
+    user = db.users.find_one({'_id': ObjectId(identity['id'])})
+    if not user:
+        return {"success": False, "message": "User not found"}, 404
 
     return {"success": True, "message": "User profile fetched successfully", "data": userSchema(user)}, 200
 
@@ -105,7 +108,7 @@ def update_user_profile():
     if not identity:
         return {"success": False, "message": "Not authorized! Invalid token"}, 401
 
-    user = db.users.find_one({'email': identity['email']})
+    user = db.users.find_one({'_id': ObjectId(identity['id'])})
 
     if not user:
         return {"success": False, "message": "User not found"}, 404
@@ -140,3 +143,21 @@ def get_all_users():
 
     users = db.users.find()
     return {"success": True, "message": "All users fetched successfully", "data": userListSchema(users)}, 200
+
+
+@user.get('/<id>')
+@jwt_required()
+def get_user_by_id(id):
+    identity = get_jwt_identity()
+    if not identity:
+        return {"success": False, "message": "Not authorized! Invalid token"}, 401
+
+    user = db.users.find_one({'_id': ObjectId(identity['id'])})
+    if not user['role'] == 'admin':
+        return {"success": False, "message": "Not authorized! You are not an admin"}, 401
+
+    user = db.users.find_one({'_id': ObjectId(id)})
+    if not user:
+        return {"success": False, "message": "User not found"}, 404
+
+    return {"success": True, "message": "User fetched successfully", "data": userSchema(user)}, 200
