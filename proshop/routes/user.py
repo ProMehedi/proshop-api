@@ -1,9 +1,9 @@
 from flask import Blueprint, request
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required, verify_jwt_in_request
+from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
 from ..models.user import User
 from ..configs.db import db
-from ..schemas.user import userSchema
+from ..schemas.user import userSchema, userListSchema
 
 user = Blueprint('user', __name__)
 
@@ -95,10 +95,34 @@ def get_user_profile():
     if not request.headers.get('Authorization').split(' ')[0] == 'Bearer':
         return {"success": False, "message": "Not authorized! Invalid token"}, 401
 
-    current_user = get_jwt_identity()
-    if not current_user:
+    identity = get_jwt_identity()
+    if not identity:
         return {"success": False, "message": "Not authorized! Invalid token"}, 401
 
-    user = db.users.find_one({'email': current_user['email']})
+    user = db.users.find_one({'email': identity['email']})
 
     return {"success": True, "message": "User profile fetched successfully", "data": userSchema(user)}, 200
+
+
+@user.get('/all')
+@jwt_required()
+def get_all_users():
+    if not request.headers:
+        return {"success": False, "message": "Not authorized! No data provided"}, 401
+
+    if not request.headers.get('Authorization'):
+        return {"success": False, "message": "Not authorized! No token provided"}, 401
+
+    if not request.headers.get('Authorization').split(' ')[0] == 'Bearer':
+        return {"success": False, "message": "Not authorized! Invalid token"}, 401
+
+    identity = get_jwt_identity()
+    if not identity:
+        return {"success": False, "message": "Not authorized! Invalid token"}, 401
+
+    user = db.users.find_one({'email': identity['email']})
+    if not user['role'] == 'admin':
+        return {"success": False, "message": "Not authorized! You are not an admin"}, 401
+
+    users = db.users.find()
+    return {"success": True, "message": "All users fetched successfully", "data": userListSchema(users)}, 200
