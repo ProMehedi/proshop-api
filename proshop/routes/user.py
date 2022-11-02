@@ -163,6 +163,43 @@ def get_user_by_id(id):
     return {"success": True, "message": "User fetched successfully", "data": userSchema(user)}, 200
 
 
+@user.put('/<id>')
+@jwt_required()
+def update_user_by_id(id):
+    if not request.is_json:
+        return {"success": False, "message": "Invalid data, Only JSON data can be pass"}, 400
+
+    identity = get_jwt_identity()
+    if not identity:
+        return {"success": False, "message": "Not authorized! Invalid token"}, 401
+
+    user = db.users.find_one({'_id': ObjectId(identity['id'])})
+    if not user['role'] == 'admin':
+        return {"success": False, "message": "Not authorized! You are not an admin"}, 401
+
+    user = db.users.find_one({'_id': ObjectId(id)})
+    if not user:
+        return {"success": False, "message": "User not found"}, 404
+
+    if request.json.get('firstName'):
+        user['first_name'] = request.json.get('firstName')
+
+    if request.json.get('lastName'):
+        user['last_name'] = request.json.get('lastName')
+
+    if request.json.get('phone'):
+        user['phone'] = request.json.get('phone')
+
+    if request.json.get('password'):
+        user['password'] = generate_password_hash(request.json.get('password'))
+
+    if request.json.get('role'):
+        user['role'] = request.json.get('role')
+
+    db.users.update_one({'_id': user['_id']}, {'$set': user})
+    return {"success": True, "message": "User updated successfully", "data": userSchema(user)}, 200
+
+
 @user.delete('/<id>')
 @jwt_required()
 def delete_user_by_id(id):
