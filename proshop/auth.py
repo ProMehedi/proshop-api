@@ -29,6 +29,11 @@ def register_user():
     if not request.json.get('password'):
         return {"success": False, "message": "Password is required"}, 400
 
+    # Check for existing user with email
+    existingUser = db.users.find_one({'email': request.json.get('email')})
+    if existingUser:
+        return {"success": False, "message": "User already exists with this email"}, 400
+
     user = User(
         first_name=request.json.get('firstName'),
         last_name=request.json.get('lastName'),
