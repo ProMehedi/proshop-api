@@ -137,7 +137,7 @@ def get_all_users():
     if not identity:
         return {"success": False, "message": "Not authorized! Invalid token"}, 401
 
-    user = db.users.find_one({'email': identity['email']})
+    user = db.users.find_one({'_id': ObjectId(identity['id'])})
     if not user['role'] == 'admin':
         return {"success": False, "message": "Not authorized! You are not an admin"}, 401
 
@@ -161,3 +161,22 @@ def get_user_by_id(id):
         return {"success": False, "message": "User not found"}, 404
 
     return {"success": True, "message": "User fetched successfully", "data": userSchema(user)}, 200
+
+
+@user.delete('/<id>')
+@jwt_required()
+def delete_user_by_id(id):
+    identity = get_jwt_identity()
+    if not identity:
+        return {"success": False, "message": "Not authorized! Invalid token"}, 401
+
+    user = db.users.find_one({'_id': ObjectId(identity['id'])})
+    if not user['role'] == 'admin':
+        return {"success": False, "message": "Not authorized! You are not an admin"}, 401
+
+    user = db.users.find_one({'_id': ObjectId(id)})
+    if not user:
+        return {"success": False, "message": "User not found"}, 404
+
+    db.users.delete_one({'_id': ObjectId(id)})
+    return {"success": True, "message": "User deleted successfully"}, 200
