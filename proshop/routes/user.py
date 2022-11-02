@@ -86,15 +86,6 @@ def login_user():
 @user.get('/profile')
 @jwt_required()
 def get_user_profile():
-    if not request.headers:
-        return {"success": False, "message": "Not authorized! No data provided"}, 401
-
-    if not request.headers.get('Authorization'):
-        return {"success": False, "message": "Not authorized! No token provided"}, 401
-
-    if not request.headers.get('Authorization').split(' ')[0] == 'Bearer':
-        return {"success": False, "message": "Not authorized! Invalid token"}, 401
-
     identity = get_jwt_identity()
     if not identity:
         return {"success": False, "message": "Not authorized! Invalid token"}, 401
@@ -104,18 +95,41 @@ def get_user_profile():
     return {"success": True, "message": "User profile fetched successfully", "data": userSchema(user)}, 200
 
 
+@user.put('/profile')
+@jwt_required()
+def update_user_profile():
+    if not request.is_json:
+        return {"success": False, "message": "Invalid data, Only JSON data can be pass"}, 400
+
+    identity = get_jwt_identity()
+    if not identity:
+        return {"success": False, "message": "Not authorized! Invalid token"}, 401
+
+    user = db.users.find_one({'email': identity['email']})
+
+    if not user:
+        return {"success": False, "message": "User not found"}, 404
+
+    if request.json.get('firstName'):
+        user['first_name'] = request.json.get('firstName')
+
+    if request.json.get('lastName'):
+        user['last_name'] = request.json.get('lastName')
+
+    if request.json.get('phone'):
+        user['phone'] = request.json.get('phone')
+
+    if request.json.get('password'):
+        user['password'] = generate_password_hash(request.json.get('password'))
+
+    db.users.update_one({'_id': user['_id']}, {'$set': user})
+
+    return {"success": True, "message": "User profile updated successfully", "data": userSchema(user)}, 200
+
+
 @user.get('/all')
 @jwt_required()
 def get_all_users():
-    if not request.headers:
-        return {"success": False, "message": "Not authorized! No data provided"}, 401
-
-    if not request.headers.get('Authorization'):
-        return {"success": False, "message": "Not authorized! No token provided"}, 401
-
-    if not request.headers.get('Authorization').split(' ')[0] == 'Bearer':
-        return {"success": False, "message": "Not authorized! Invalid token"}, 401
-
     identity = get_jwt_identity()
     if not identity:
         return {"success": False, "message": "Not authorized! Invalid token"}, 401
