@@ -1,8 +1,9 @@
 from flask import Blueprint, request
+from pydantic import ValidationError
 from bson.objectid import ObjectId
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
-from ..models.user import User
+from ..models.user import User, Address
 from ..configs.db import db
 from ..schemas.user import userSchema, userListSchema
 
@@ -17,42 +18,38 @@ def register_user():
     if not request.is_json:
         return {"success": False, "message": "Invalid data, Only JSON data can be pass"}, 400
 
-    if not request.json.get('firstName'):
-        return {"success": False, "message": "First Name is required"}, 400
-
-    if not request.json.get('lastName'):
-        return {"success": False, "message": "Last Name is required"}, 400
-
-    if not request.json.get('email'):
-        return {"success": False, "message": "Email is required"}, 400
-
-    if not request.json.get('phone'):
-        return {"success": False, "message": "Phone is required"}, 400
-
-    if not request.json.get('password'):
-        return {"success": False, "message": "Password is required"}, 400
-
-    # Check for existing user with email
     existingUser = db.users.find_one({'email': request.json.get('email')})
     if existingUser:
         return {"success": False, "message": "User already exists with this email"}, 400
 
-    user = User(
-        first_name=request.json.get('firstName'),
-        last_name=request.json.get('lastName'),
-        email=request.json.get('email'),
-        phone=request.json.get('phone'),
-        password=generate_password_hash(request.json.get('password'))
-    )
+    try:
+        address = Address(
+            address=request.json.get('address'),
+            city=request.json.get('city'),
+            state=request.json.get('state'),
+            country=request.json.get('country'),
+            zip=request.json.get('zip')
+        )
+        user = User(
+            firstName=request.json.get('firstName'),
+            lastName=request.json.get('lastName'),
+            email=request.json.get('email'),
+            phone=request.json.get('phone'),
+            password=generate_password_hash(request.json.get('password')),
+            address=address
+        )
 
-    new_user = db.users.insert_one(dict(user))
-    created_user = db.users.find_one({'_id': new_user.inserted_id})
-    return {
-        "success": True,
-        "message": "User registered successfully",
-        "data": userSchema(created_user),
-        "token": create_access_token({'id': str(created_user['_id'])})
-    }, 201
+        new_user = db.users.insert_one(dict(user))
+        created_user = db.users.find_one({'_id': new_user.inserted_id})
+        return {
+            "success": True,
+            "message": "User registered successfully",
+            "data": userSchema(created_user),
+            "token": create_access_token({'id': str(created_user['_id'])})
+        }, 201
+
+    except ValidationError as e:
+        return {"success": False, "message": e.errors()}, 400
 
 
 @user.post('/login')
@@ -77,6 +74,7 @@ def login_user():
     if not check_password_hash(user['password'], request.json.get('password')):
         return {"success": False, "message": "Invalid credentials"}, 400
 
+    user.pop('password')
     return {
         "success": True,
         "message": "User logged in successfully",
@@ -115,10 +113,10 @@ def update_user_profile():
         return {"success": False, "message": "User not found"}, 404
 
     if request.json.get('firstName'):
-        user['first_name'] = request.json.get('firstName')
+        user['firstName'] = request.json.get('firstName')
 
     if request.json.get('lastName'):
-        user['last_name'] = request.json.get('lastName')
+        user['lastName'] = request.json.get('lastName')
 
     if request.json.get('phone'):
         user['phone'] = request.json.get('phone')
@@ -183,10 +181,10 @@ def update_user_by_id(id):
         return {"success": False, "message": "User not found"}, 404
 
     if request.json.get('firstName'):
-        user['first_name'] = request.json.get('firstName')
+        user['firstName'] = request.json.get('firstName')
 
     if request.json.get('lastName'):
-        user['last_name'] = request.json.get('lastName')
+        user['lastName'] = request.json.get('lastName')
 
     if request.json.get('phone'):
         user['phone'] = request.json.get('phone')

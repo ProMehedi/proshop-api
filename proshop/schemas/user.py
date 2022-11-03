@@ -1,13 +1,14 @@
 def userSchema(user) -> dict:
     return {
         'id': str(user['_id']),
-        'firstName': user['first_name'],
-        'lastName': user['last_name'],
+        'firstName': user['firstName'],
+        'lastName': user['lastName'],
         'email': user['email'],
         'phone': user['phone'],
-        'password': user['password'],
+        'password': user['password'] if 'password' in user else None,
         'role': user['role'],
-        'createdAt': user['created_at']
+        'createdAt': user['created_at'],
+        'address': user['address']
     }
 
 
