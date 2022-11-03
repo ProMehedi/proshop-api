@@ -23,20 +23,18 @@ def register_user():
         return {"success": False, "message": "User already exists with this email"}, 400
 
     try:
-        address = Address(
-            address=request.json.get('address'),
-            city=request.json.get('city'),
-            state=request.json.get('state'),
-            country=request.json.get('country'),
-            zip=request.json.get('zip')
-        )
         user = User(
             firstName=request.json.get('firstName'),
             lastName=request.json.get('lastName'),
             email=request.json.get('email'),
+            username=request.json.get('username'),
+            company=request.json.get('company'),
+            avatar=request.json.get('avatar'),
             phone=request.json.get('phone'),
             password=generate_password_hash(request.json.get('password')),
-            address=address
+            shipping=Address(**request.json.get('shipping')),
+            billing=Address(**request.json.get('billing')),
+            otp=request.json.get('otp'),
         )
 
         new_user = db.users.insert_one(dict(user))
