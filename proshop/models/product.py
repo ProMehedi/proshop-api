@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field, constr
-from typing import List
+from typing import List, Any
 from enum import Enum
 import datetime as dt
 
@@ -26,25 +26,37 @@ class Review(BaseModel):
     reviewFor: str
 
 
+class Brand(BaseModel):
+    name: str
+    slug: str
+    desc: str
+    image: str
+    status: Status
+    createdAt: str = Field(default=dt.datetime.utcnow())
+    updatedAt: str
+
+
 class Product(BaseModel):
     name: str = Field(min_length=3, strip_whitespace=True, strict=True)
     slug: constr(strip_whitespace=True, strict=True)
     desc: str = Field(min_length=10, default="")
     shortDesc: constr(min_length=10, strip_whitespace=True,
-                      strict=True, curtail_length=100) = ""
+                      strict=True, curtail_length=100) = Field(default=None)
     price: float = Field(ge=0.0, default=0.0)
-    regular_price: float = Field(ge=0.0, default=None)
-    category: str = ""
-    type: Type = Type.simple
-    status: Status = Status.publish
+    regularPrice: float = Field(ge=0.0, default=None)
+    categories: list = Field(default=[])
+    type: Type = Field(default=Type.simple)
+    status: Status = Field(default=Status.draft)
     featured: bool = False
-    quantity: int = Field(ge=0, default=0)
-    sku: constr(min_length=3, strip_whitespace=True, strict=True) = None
+    stockQuantity: int = Field(ge=0, default=0)
+    sku: constr(min_length=3, strip_whitespace=True,
+                strict=True) = Field(default=None)
+    thumbnail: str = ""
     images: list = Field(default=[])
     attributes: list = Field(default=[])
-    categories: list = Field(default=[])
+    brand: Brand = Field(default=None)
     rating: float = Field(ge=0.0, le=5.0, default=None)
-    created_at: str = Field(default=dt.datetime.utcnow())
-    updated_at: str = ""
-    user_id: str
+    createdAt: str = Field(default=dt.datetime.utcnow())
+    updatedAt: str = ""
+    userId: Any
     reviews: List[Review] = []
