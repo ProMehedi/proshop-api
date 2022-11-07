@@ -62,10 +62,25 @@ def create_product():
         return {"success": False, "message": e.errors()}, 400
 
 
+
 # Get Product by Slug
 @products.get('/<slug>')
-def get_product(slug):
+def get_product_by_slug(slug):
     try:
+        product = db.products.find_one({"_id": ObjectId(slug)})
+        if product:
+            return {
+                "success": True,
+                "message": "Product fetched successfully",
+                "data": productSchema(product)
+            }, 200
+        else:
+            return {
+                "success": False,
+                "message": "Sorry, no product found",
+            }, 404
+
+    except Exception as e:
         product = db.products.find_one({"slug": slug})
         if product:
             return {
@@ -76,7 +91,5 @@ def get_product(slug):
         else:
             return {
                 "success": False,
-                "message": "Sorry, no product found"
+                "message": str(e)
             }, 404
-    except ValidationError as e:
-        return {"success": False, "message": e.errors()}, 400
