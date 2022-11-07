@@ -9,6 +9,7 @@ from ..configs.db import db
 products = Blueprint('products', __name__)
 
 
+# Create New Product
 @products.post('/new')
 @jwt_required()
 def create_product():
@@ -57,5 +58,25 @@ def create_product():
             "message": "Product created successfully",
             "data": productSchema(created_product)
         }, 201
+    except ValidationError as e:
+        return {"success": False, "message": e.errors()}, 400
+
+
+# Get Product by Slug
+@products.get('/<slug>')
+def get_product(slug):
+    try:
+        product = db.products.find_one({"slug": slug})
+        if product:
+            return {
+                "success": True,
+                "message": "Product fetched successfully",
+                "data": productSchema(product)
+            }, 200
+        else:
+            return {
+                "success": False,
+                "message": "Sorry, no product found"
+            }, 404
     except ValidationError as e:
         return {"success": False, "message": e.errors()}, 400
