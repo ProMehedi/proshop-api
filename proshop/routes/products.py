@@ -3,10 +3,28 @@ from pydantic import ValidationError
 from bson.objectid import ObjectId
 from flask_jwt_extended import get_jwt_identity, jwt_required
 from ..models.product import Product
-from ..schemas.product import productSchema
+from ..schemas.product import productSchema, productListSchema
 from ..configs.db import db
 
 products = Blueprint('products', __name__)
+
+
+# Get All Products
+@products.get('')
+def get_products():
+    try:
+        products = db.products.find({})
+
+        return {
+            "success": True,
+            "message": "All products fetched successfully",
+            "data": productListSchema(products),
+        }, 200
+    except Exception as e:
+        return {
+            "success": False,
+            "message": str(e)
+        }, 400
 
 
 # Create New Product
