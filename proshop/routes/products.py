@@ -27,6 +27,10 @@ def create_product():
     if not request.is_json:
         return {"success": False, "message": "Invalid data, Only JSON data can be pass"}, 400
 
+    existingSlug = db.users.find_one({'slug': request.json.get('slug')})
+    if existingSlug:
+        return {"success": False, "message": "Sorry slug not available"}, 400
+
     try:
         product = Product(
             name=request.json.get('name'),
@@ -62,10 +66,9 @@ def create_product():
         return {"success": False, "message": e.errors()}, 400
 
 
-
 # Get Product by Slug
 @products.get('/<slug>')
-def get_product_by_slug(slug):
+def get_product(slug):
     try:
         product = db.products.find_one({"_id": ObjectId(slug)})
         if product:
