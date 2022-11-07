@@ -10,7 +10,8 @@ from ..schemas.user import userSchema, userListSchema
 user = Blueprint('user', __name__)
 
 
-@user.post('/register')
+# Register New User
+@user.post('/')
 def register_user():
     if not request.data:
         return {"success": False, "message": "No data provided"}, 400
@@ -50,6 +51,7 @@ def register_user():
         return {"success": False, "message": e.errors()}, 400
 
 
+# Login User
 @user.post('/login')
 def login_user():
     if not request.data:
@@ -81,6 +83,7 @@ def login_user():
     }, 200
 
 
+# Get User Profile
 @user.get('/profile')
 @jwt_required()
 def get_user_profile():
@@ -95,6 +98,7 @@ def get_user_profile():
     return {"success": True, "message": "User profile fetched successfully", "data": userSchema(user)}, 200
 
 
+# Update User Profile
 @user.put('/profile')
 @jwt_required()
 def update_user_profile():
@@ -127,7 +131,8 @@ def update_user_profile():
     return {"success": True, "message": "User profile updated successfully", "data": userSchema(user)}, 200
 
 
-@user.get('/all')
+# Get All Users
+@user.get('/')
 @jwt_required()
 def get_all_users():
     identity = get_jwt_identity()
@@ -142,6 +147,7 @@ def get_all_users():
     return {"success": True, "message": "All users fetched successfully", "data": userListSchema(users)}, 200
 
 
+# Get User by Id
 @user.get('/<id>')
 @jwt_required()
 def get_user_by_id(id):
@@ -160,6 +166,7 @@ def get_user_by_id(id):
     return {"success": True, "message": "User fetched successfully", "data": userSchema(user)}, 200
 
 
+# Update User by Id
 @user.put('/<id>')
 @jwt_required()
 def update_user_by_id(id):
@@ -197,6 +204,7 @@ def update_user_by_id(id):
     return {"success": True, "message": "User updated successfully", "data": userSchema(user)}, 200
 
 
+# Delete User by Id
 @user.delete('/<id>')
 @jwt_required()
 def delete_user_by_id(id):

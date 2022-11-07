@@ -14,7 +14,7 @@ def create_app(config_file='configs/settings.py'):
     from .routes.categories import categories
     from .routes.reviews import reviews
 
-    app.register_blueprint(user, url_prefix=f'/{URL_PREFIX}/user')
+    app.register_blueprint(user, url_prefix=f'/{URL_PREFIX}/users')
     app.register_blueprint(products, url_prefix=f'/{URL_PREFIX}/products')
     app.register_blueprint(orders, url_prefix=f'/{URL_PREFIX}/orders')
     app.register_blueprint(categories, url_prefix=f'/{URL_PREFIX}/categories')
